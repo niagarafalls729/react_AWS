@@ -1,9 +1,9 @@
 import React from "react";
 import "./SidebarThema.css";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useRef } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { ChoiceMenuState } from "../ChoiceMenuState";
-
+import { ChoiceMenuState } from "../Context/ChoiceMenuState";
+import { SidebarClose } from "../Context/SidebarClose";
 function Sidebar() {
   const [menuList, setMenuList] = useState([
     {
@@ -47,26 +47,81 @@ function Sidebar() {
   // });
 
   const { menuIndex, setMenuIndex } = useContext(ChoiceMenuState);
-  function ChoiceMenu(name) { 
+  const { conSidebarBool, setConSidebarBool } = useContext(SidebarClose);
+
+  
+  function ChoiceMenu(name) {
     setMenuIndex(name);
   }
+
+  const mySider = useRef();
+
+  const [sideBarBool, setSideBarBool] = useState(true);
+  function close() {
+    setSideBarBool(false);
+    setConSidebarBool(false);
+  }
+  function open() {
+    setSideBarBool(true);
+    setConSidebarBool(true);
+  }
+
   return (
-    <div className="SidebarThema">
-      <BrowserRouter>
-        <ul>
-          {menuList.map((i,j) => (
-            <li  key={j} onClick={() => ChoiceMenu(i.pageName)}>
-              <Link to={i.itemId}>{i.title}</Link>
+    //<div className={`divider ${closeList ? '' : 'open'}`}></div>
+    <>
+      <div className={sideBarBool ? "SidebarThema" : "NoneSideberThema"}>
+        <link
+          rel="stylesheet"
+          href="https://www.w3schools.com/w3css/4/w3.css"
+        ></link>
+
+        <div
+          className="w3-sidebar w3-bar-block w3-dark-grey w3-animate-left"
+          id="mySidebar"
+          ref={mySider}
+        >
+          <BrowserRouter>
+            <li className="mainClose">
+              <button className="w3-bar-item w3-button" onClick={close}>
+                &#9776;
+              </button>
             </li>
-          ))}
-        </ul>
-        <Routes>
-          {menuList.map((i,k) => (
-            <Route key={k} path={i.itemId} element={""} />
-          ))}
-        </Routes>
-      </BrowserRouter>
-    </div>
+            <li className="mainClose">
+              <button
+                className="w3-bar-item w3-button w3-large"
+                onClick={() => ChoiceMenu("main")}
+              >
+                <Link className="MenuLink" to={"/"}>
+                  Main
+                </Link>
+              </button>
+            </li>
+
+            {menuList.map((i, j) => (
+              <ul
+                className="w3-bar-item w3-button w3-hover-text-red"
+                key={j}
+                onClick={() => ChoiceMenu(i.pageName)}
+              >
+                <Link className="MenuLink" to={i.itemId}>
+                  {i.title}
+                </Link>
+              </ul>
+            ))}
+
+            <Routes>
+              <Route key="0" path="/" element={""} />
+              {menuList.map((i, k) => (
+                <Route key={k} path={i.itemId} element={""} />
+              ))}
+            </Routes>
+          </BrowserRouter>
+        </div>
+      </div>
+      <button className="w3-button w3-white" onClick={open}>
+        &#9776;
+      </button>
+    </>
   );
 }
 

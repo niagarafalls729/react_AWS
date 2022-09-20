@@ -2,4 +2,18 @@
     float: left;
     clear: left;
     width: 200px;
+} 
+ .MenuLink{
+    font-weight: bold;
+    letter-spacing :0.5px;
+    text-decoration: none;
+    line-height: 1em;
+}
+ .mainClose{
+    float: left;
+    list-style-type: none;
+ }
+ .NoneSideberThema{ 
+    display: none;
+
 }
