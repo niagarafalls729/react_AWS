@@ -2,8 +2,10 @@ import React from "react";
 import "./SidebarThema.css";
 import { useState, useContext, useRef } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { ChoiceMenuState } from "../Context/ChoiceMenuState";
-import { SidebarClose } from "../Context/SidebarClose";
+import { ChoiceMenuState } from "../context/ChoiceMenuState";
+import { SidebarClose } from "../context/SidebarClose";
+
+import Main from '../main/Main';
 function Sidebar() {
   const [menuList, setMenuList] = useState([
     {
@@ -29,7 +31,7 @@ function Sidebar() {
     {
       title: "방명록",
       itemId: "3",
-      pageName: "guest book",
+      pageName: "Guestbook",
       subNav: [
         {
           subTitle: "3-1",
@@ -66,8 +68,7 @@ function Sidebar() {
     setConSidebarBool(true);
   }
 
-  return (
-    //<div className={`divider ${closeList ? '' : 'open'}`}></div>
+  return ( 
     <>
       <div className={sideBarBool ? "SidebarThema" : "NoneSideberThema"}>
         <link
@@ -111,6 +112,7 @@ function Sidebar() {
 
             <Routes>
               <Route key="0" path="/" element={""} />
+
               {menuList.map((i, k) => (
                 <Route key={k} path={i.itemId} element={""} />
               ))}
