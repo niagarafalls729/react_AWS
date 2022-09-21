@@ -1,11 +1,11 @@
 import React from "react";
 import "./SidebarThema.css";
+
 import { useState, useContext, useRef } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { ChoiceMenuState } from "../context/ChoiceMenuState";
 import { SidebarClose } from "../context/SidebarClose";
-
-import Main from '../main/Main';
+// import IndexNavbar from "./IndexNavbar";
 function Sidebar() {
   const [menuList, setMenuList] = useState([
     {
@@ -71,22 +71,22 @@ function Sidebar() {
   return ( 
     <>
       <div className={sideBarBool ? "SidebarThema" : "NoneSideberThema"}>
+      
+
+      
         <link
           rel="stylesheet"
           href="https://www.w3schools.com/w3css/4/w3.css"
         ></link>
 
         <div
-          className="w3-sidebar w3-bar-block w3-dark-grey w3-animate-left"
+          className="w3-sidebar w3-bar-block w3-animate-left"
           id="mySidebar"
           ref={mySider}
         >
+          
           <BrowserRouter>
-            <li className="mainClose">
-              <button className="w3-bar-item w3-button" onClick={close}>
-                &#9776;
-              </button>
-            </li>
+            
             <li className="mainClose">
               <button
                 className="w3-bar-item w3-button w3-large"
@@ -97,7 +97,11 @@ function Sidebar() {
                 </Link>
               </button>
             </li>
-
+            <li className="mainClose-X">
+              <button className="w3-bar-item w3-button" onClick={close}>
+                &#9776;
+              </button>
+            </li>
             {menuList.map((i, j) => (
               <ul
                 className="w3-bar-item w3-button w3-hover-text-red"
@@ -123,6 +127,7 @@ function Sidebar() {
       <button className="w3-button w3-white" onClick={open}>
         &#9776;
       </button>
+      
     </>
   );
 }

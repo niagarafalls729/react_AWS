@@ -1,19 +1,25 @@
-.SidebarThema  {
-    float: left;
-    clear: left;
-    width: 200px;
-} 
- .MenuLink{
-    font-weight: bold;
-    letter-spacing :0.5px;
-    text-decoration: none;
-    line-height: 1em;
+.SidebarThema {
+  float: left;
+  clear: left;
+  width: 200px;
 }
- .mainClose{
-    float: left;
-    list-style-type: none;
- }
- .NoneSideberThema{ 
-    display: none;
+.MenuLink {
+  font-weight: bold;
+}
+.mainClose {
+  float: left;
+  list-style-type: none;
+}
+.mainClose-X {
+  float: left;
+  list-style-type: none;
+  margin-left: 74.1px;
+}
 
+.NoneSideberThema {
+  display: none;
+}
+.w3-sidebar {
+  background-color: #212529 !important;
+  color: white;
 }
