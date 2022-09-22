@@ -1,9 +1,7 @@
-import React from "react";
-
+import React from "react"; 
 export default function blogUser() {
   return (
-    <>
-    
+    <> 
       <button className="button is-primary">Button</button>
       <button className="button is-link">Button</button>
       <button className="button is-info">Button</button>

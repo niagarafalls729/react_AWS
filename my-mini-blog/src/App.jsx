@@ -16,7 +16,7 @@ function App() {
 
   return (
       
-    <div> 
+   <>
       <IndexNavbar></IndexNavbar>
       <ChoiceMenuState.Provider value={{ menuIndex, setMenuIndex }}>
         <SidebarClose.Provider value={{ conSidebarBool, setConSidebarBool }}>
@@ -27,7 +27,7 @@ function App() {
           
         </SidebarClose.Provider>
       </ChoiceMenuState.Provider>
-    </div>
+    </>
   );
 }
 

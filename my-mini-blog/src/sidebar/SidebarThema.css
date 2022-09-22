@@ -23,3 +23,14 @@
   background-color: #212529 !important;
   color: white;
 }
+ 
+.myMapClose {
+  float: left;
+  list-style-type: none; 
+}
+.MapClose-X {
+  float: left;
+  display: flex;
+  list-style-type: none;
+  margin-left: 30.1px;
+}

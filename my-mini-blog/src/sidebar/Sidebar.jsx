@@ -5,6 +5,8 @@ import { useState, useContext, useRef } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { ChoiceMenuState } from "../context/ChoiceMenuState";
 import { SidebarClose } from "../context/SidebarClose";
+import ClientIp from "../weget/ClientIp";
+import Weather from "../weget/Weather";
 // import IndexNavbar from "./IndexNavbar";
 function Sidebar() {
   const [menuList, setMenuList] = useState([
@@ -51,7 +53,6 @@ function Sidebar() {
   const { menuIndex, setMenuIndex } = useContext(ChoiceMenuState);
   const { conSidebarBool, setConSidebarBool } = useContext(SidebarClose);
 
-  
   function ChoiceMenu(name) {
     setMenuIndex(name);
   }
@@ -68,12 +69,9 @@ function Sidebar() {
     setConSidebarBool(true);
   }
 
-  return ( 
+  return (
     <>
       <div className={sideBarBool ? "SidebarThema" : "NoneSideberThema"}>
-      
-
-      
         <link
           rel="stylesheet"
           href="https://www.w3schools.com/w3css/4/w3.css"
@@ -84,9 +82,7 @@ function Sidebar() {
           id="mySidebar"
           ref={mySider}
         >
-          
           <BrowserRouter>
-            
             <li className="mainClose">
               <button
                 className="w3-bar-item w3-button w3-large"
@@ -122,12 +118,14 @@ function Sidebar() {
               ))}
             </Routes>
           </BrowserRouter>
+          
+            <ClientIp></ClientIp>
+           <Weather></Weather>
         </div>
       </div>
       <button className="w3-button w3-white" onClick={open}>
         &#9776;
       </button>
-      
     </>
   );
 }
