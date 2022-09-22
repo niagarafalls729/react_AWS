@@ -1,0 +1,28 @@
+.fixed-top{
+
+  position: sticky;
+	top: 0;
+  text-align: left;
+  text-align: center;
+  text-align: right;
+  text-align: justify;
+  width: 100%;  
+ 
+
+}  
+/* .fixed-top-scroll{
+  width: 50%;  
+} */
+
+.marginBrand{
+  /* margin-left: 20px; */
+  text-align: left;
+  text-align: center;
+  text-align: right;
+  
+  text-align: justify;
+}   
+.marginBrand button{
+  display: none;
+
+}
