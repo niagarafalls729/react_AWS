@@ -35,7 +35,7 @@ function Guestbook() {
   const saveInput = useRef();
   function fn_save(){
     console.log("fn_save"+saveInput.current.value)
-
+    
   }
 
   return  <>

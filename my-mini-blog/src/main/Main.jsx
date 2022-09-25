@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useContext } from "react";
+import {  useContext } from "react";
 import { ChoiceMenuState } from "../context/ChoiceMenuState";
 import { SidebarClose } from "../context/SidebarClose";
 import "./Main.css"
