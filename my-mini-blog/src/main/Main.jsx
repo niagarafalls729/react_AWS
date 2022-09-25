@@ -5,7 +5,7 @@ import { SidebarClose } from "../context/SidebarClose";
 import "./Main.css"
 import BlogUser from '../menu/BlogUser';
 import StudyHistory from '../menu/StudyHistory';
-import Guestbook from '../menu/Guestbook';
+import GuestBook from '../menu/GuestBook';
 import HomeContents from '../menu/HomeContents';
 
 export default function Main() {
@@ -19,7 +19,7 @@ export default function Main() {
       case "StudyHistory":
         return <StudyHistory></StudyHistory>
       case "Guestbook":
-        return <Guestbook></Guestbook>
+        return <GuestBook></GuestBook>
       default:
         return <HomeContents></HomeContents>
     }
