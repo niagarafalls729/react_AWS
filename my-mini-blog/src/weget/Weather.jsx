@@ -1,7 +1,7 @@
 
 import sun from "../icon/sun.png"
-import rain from "../icon/rain.png"
-import cloud from "../icon/cloud.png"
+// import rain from "../icon/rain.png"
+// import cloud from "../icon/cloud.png"
 import React, { useState,useEffect,useContext } from "react";
 import { SidebarClose } from "../context/SidebarClose";
 
