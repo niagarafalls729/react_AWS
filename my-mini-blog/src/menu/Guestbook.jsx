@@ -1,8 +1,12 @@
-import Table from "react-bootstrap/Table";
-import { useState, useEffect, useId } from "react";
+import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
+import Accordion from "react-bootstrap/Accordion";
+import Button from "react-bootstrap/Button";
+import { useState, useEffect, useId, useRef } from "react";
 // 파이어베이서 파일에서 import 해온 db
 import { db } from "../FireBase/DBconfig";
- import GuestBookDetail from "./GuestBookDetail";
+import GuestBookDetail from "./GuestBookDetail";
 // db에 접근해서 데이터를 꺼내게 도와줄 친구들
 import {
   collection,
@@ -30,7 +34,7 @@ function ActiveExample() {
     const getUsers = async () => {
       // getDocs로 컬렉션안에 데이터 가져오기
       const data = await getDocs(usersCollectionRef);
-      
+
       // users에 data안의 자료 추가. 객체에 id 덮어씌우는거
       setUsers(
         data.docs.map((findDoc) => ({ ...findDoc.data(), id: findDoc.id }))
@@ -38,7 +42,6 @@ function ActiveExample() {
     };
     setChanged(false);
     getUsers();
-    
   }, [changed]);
 
   function fn_mouseOver(key) {
@@ -51,46 +54,74 @@ function ActiveExample() {
     key.target.style.background = "white";
     key.target.style.color = "black";
   }
-  function fn_click(key) {
-    // 게시글 선택
-    SetChoiceState(key); 
-    
-  }
-   
-  function contentList() {
-    return (
-      <Table striped bordered hover variant="dark">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>제목</th>
-            <th>시간</th>
-            <th>작성자</th>
-          </tr>
-        </thead>
-        <tbody>
-          
-            {users.map((value) => ( value && (
-              <tr key={uniqueId} onClick={()=>fn_click(value.comment)}>
-              <td>{value.comment}</td>
-              <td>{value.title}</td>
-              <td>{value.created.timestampValue}</td>
-              <td>{value.name}</td>
-              </tr>    
-              )
-            ))
-            }
-          
-        </tbody>
-      </Table>
-    );
+
+  function fn_comnet_save(key){
+    console.log("댓글"+key)
   }
 
+  function fn_click(key) {
+    // 게시글 선택
+    SetChoiceState(key);
+    console.log("key" + key);
+    // return (
+    //   <div>
+    //     <input></input>
+    //     <button>등록</button>
+    //   </div>
+    // );
+  }
+  const AB = useRef();  
+
+  const  contentList = 
+  
+      <Accordion key={uniqueId} flush>
+        {users.map(
+          (value) =>
+            value && (
+              // <tr key={uniqueId} onClick={() => fn_click(value.comment)}>
+              <>
+                <Accordion.Item key={uniqueId} eventKey={value.comment}>
+                  <Accordion.Header onClick={() => fn_click(value.comment)}>
+                    {value.title}
+                     
+                  </Accordion.Header>
+                  <Accordion.Body ref={AB}>
+                    <Row>
+                      <Col>
+                        <h1>{value.content}</h1>
+                      </Col>
+                      <Col xs="auto">
+                        <Button onClick={() => fn_comnet_save(value.comment)} className="mb-3">
+                          삭제
+                        </Button>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col>
+                        <Form.Control className="mb-2" id="inlineFormInput" ref={AB} />
+                      </Col>
+                      <Col xs="auto">
+                        <Button onClick={() => fn_comnet_save(value.comment)} className="mb-2">
+                          등록
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Accordion.Body>
+                </Accordion.Item>
+              </>
+            )
+        )}
+      </Accordion>
+  
 
   return (
     <>
-      {choiceState && <div><GuestBookDetail selectNum = {choiceState}/></div>}
-      {contentList()}
+      {/* {choiceState && (
+        <div>
+          <GuestBookDetail selectNum={choiceState} />
+        </div>
+      )} */}
+      {contentList}
     </>
   );
 }
