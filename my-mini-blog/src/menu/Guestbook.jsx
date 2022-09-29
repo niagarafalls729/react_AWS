@@ -6,6 +6,8 @@ import "./GuestBook.css";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useState, useEffect, useId, useRef } from "react";
+import moment from 'moment';
+import 'moment/locale/ko';	//대한민국 
 // 파이어베이서 파일에서 import 해온 db
 import { db } from "../FireBase/DBconfig";
 import GuestBookDetail from "./GuestBookDetail";
@@ -16,7 +18,11 @@ import {
   addDoc,
   updateDoc,
   doc,
-  deleteDoc,orderBy,limit,query
+  deleteDoc,
+  orderBy,
+  limit,
+  query,
+  fromDate,
 } from "firebase/firestore/lite";
 
 function ActiveExample() {
@@ -31,7 +37,7 @@ function ActiveExample() {
   const createdTitleRef = useRef();
   const createdContentRef = useRef();
   const createdNameRef = useRef();
-
+  const dateKR = new Date();
   // db의 users 컬렉션을 가져옴
   const usersCollectionRef = collection(db, "guestbook");
   // 유니크 id를 만들기 위한 useId(); - react 18 기능으로, 이 훅을 이렇게 사용하는게 맞고 틀린지는 모른다.
@@ -43,8 +49,14 @@ function ActiveExample() {
     // 비동기로 데이터 받을준비
     const getUsers = async () => {
       // getDocs로 컬렉션안에 데이터 가져오기
-      const data = await getDocs(usersCollectionRef);
+      const q = query(
+        collection(db, "guestbook"),
+        orderBy("comment", "desc"),
+      );
+      const data = await getDocs(q);
+     
 
+  
       // users에 data안의 자료 추가. 객체에 id 덮어씌우는거
       setUsers(
         data.docs.map((findDoc) => ({ ...findDoc.data(), id: findDoc.id }))
@@ -71,45 +83,58 @@ function ActiveExample() {
 
   const AB = useRef();
   function fn_created_setting() {
-   
-    console.log(createdTitleRef.current.value)
-    console.log(createdContentRef.current.value)
-    console.log(createdNameRef.current.value)
+ 
     fn_created();
   }
-     
+
   // 비동기로 데이터 받을준비
   async function fn_created() {
     // getDocs로 컬렉션안에 데이터 가져오기
-    
+
     //console.log("data:::"+JSON.stringify(data))
     // users에 data안의 자료 추가. 객체에 id 덮어씌우는거
 
-    const usersCollectionRef = collection(db, "guestbook") 
-    const q = query(collection(db, "guestbook"), orderBy("comment","desc"), limit(1));
+    const usersCollectionRef = collection(db, "guestbook");
+    const q = query(
+      collection(db, "guestbook"),
+      orderBy("comment", "desc"),
+      limit(1)
+    );
     const data2 = await getDocs(q);
-    
-    const maxnum = data2.docs.map((findDoc) => ({ ...findDoc.data(), id: findDoc.id }))
-    console.log(maxnum[0].comment)
-  };
-   
-   
 
-    
+    const maxnum = data2.docs.map((findDoc) => ({
+      ...findDoc.data(),
+      id: findDoc.id,
+    }));
 
-    // await addDoc(usersCollectionRef, { title: createdTitleRef.current.value
-    //   , content  : createdContentRef.current.value
-    //   , name     : createdNameRef.current.value
-    //   , created  : createdNameRef.current.value
-    //   , comment  : age
-    // });
+    console.log("save시도");
+ 
+    await addDoc(usersCollectionRef, { title: createdTitleRef.current.value
+      , content  : createdContentRef.current.value
+      , name     : createdNameRef.current.value
+      , created  : new Date()
+      , comment  : maxnum[0].comment+1
+    });
+    setCreated(false)
+    setChanged(true);
+
+  }
 
 
-    // setCreated(false)
-    // setChanged(true);
-  
   function fn_created_coment(key) {
     console.log("Dcreatedcoment" + key);
+
+
+
+
+
+
+  }
+  function fn_date(inputDate){
+  
+    const date = new Date(+inputDate + 3240 * 10000).toISOString().split("T")[0]
+    
+    return date
   }
 
   const contentList = (
@@ -124,7 +149,7 @@ function ActiveExample() {
                   {value.title}
                 </Accordion.Header>
                 <Accordion.Body ref={AB}>
-                  <Row>
+                  <Row key={uniqueId}>
                     <Col>
                       <Form.Group className="mb-3-hidden">
                         <Form.Control
@@ -150,9 +175,7 @@ function ActiveExample() {
                       </Button>
                     </Col>
                   </Row>
-                  <Row>
-                    <Col>create Date: {value.created.seconds}</Col>
-                  </Row>
+                  <Row><Col>작성자 : {value.name}  |  작성일 :{fn_date(value.created.seconds*1000)}</Col></Row>
                   <Row>
                     <Col>
                       <Form.Control
@@ -197,16 +220,32 @@ function ActiveExample() {
         {created && (
           <Modal.Dialog>
             <Modal.Header>
-              <Form.Control id="inlineFormInput" ref={createdTitleRef} placeholder="제목" />
+              <Form.Control
+                id="inlineFormInput"
+                ref={createdTitleRef}
+                placeholder="제목"
+                maxLength="40"
+              />
             </Modal.Header>
 
             <Modal.Body>
-              <Form.Control as="textarea" ref={createdContentRef} rows={5} placeholder="내용" />
+              <Form.Control
+                as="textarea"
+                ref={createdContentRef}
+                rows={5}
+                maxLength="200"
+                placeholder="내용"
+              />
             </Modal.Body>
 
             <Modal.Footer>
               <Col>
-                <Form.Control id="inlineFormInput"  ref={createdNameRef}  placeholder="작성자" />
+                <Form.Control
+                  id="inlineFormInput"
+                  ref={createdNameRef}
+                  maxLength="20"
+                  placeholder="작성자"
+                />
               </Col>
               <Button variant="primary" onClick={() => fn_created_setting()}>
                 등록 >___@{" "}
@@ -214,7 +253,6 @@ function ActiveExample() {
               <Button variant="secondary" onClick={() => setCreated(false)}>
                 Close
               </Button>
-
             </Modal.Footer>
           </Modal.Dialog>
         )}
