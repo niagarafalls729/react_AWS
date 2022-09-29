@@ -30,14 +30,15 @@ function ActiveExample() {
   const [users, setUsers] = useState([]);
   //C 로 쓰는 값
   const [created, setCreated] = useState(false);
-  const [createdTitle, setCreatedTitle] = useState("");
-  const [createdContent, setCreatedContent] = useState("");
-  const [createdName, setCreatedName] = useState("");
+  const [modified, setModified] = useState(false);
+ 
 
   const createdTitleRef = useRef();
+  
   const createdContentRef = useRef();
+  const modifiedContentRef = useRef();
   const createdNameRef = useRef();
-  const dateKR = new Date();
+
   // db의 users 컬렉션을 가져옴
   const usersCollectionRef = collection(db, "guestbook");
   // 유니크 id를 만들기 위한 useId(); - react 18 기능으로, 이 훅을 이렇게 사용하는게 맞고 틀린지는 모른다.
@@ -53,10 +54,7 @@ function ActiveExample() {
         collection(db, "guestbook"),
         orderBy("comment", "desc"),
       );
-      const data = await getDocs(q);
-     
-
-  
+      const data = await getDocs(q); 
       // users에 data안의 자료 추가. 객체에 id 덮어씌우는거
       setUsers(
         data.docs.map((findDoc) => ({ ...findDoc.data(), id: findDoc.id }))
@@ -79,6 +77,31 @@ function ActiveExample() {
 
   function fn_comnet_save(key) {
     console.log("댓글" + key);
+  }
+
+  async function fn_modified(key) {
+    
+    console.log("수정" + key);
+    //key.target.style.display = "none";
+    if(!modified ) {
+      setModified(key);
+    }else if(modified > 0){
+ 
+      console.log("tnwjdtnwjd"+modified+"/" +modifiedContentRef.current.value +Number(key))
+      //id 로 해당 디비중에 값을 찾음.
+ 
+      const modiDoc = doc(db, "comment", String(modified))
+      console.log("modiDoc"+JSON.stringify(modiDoc))
+      const newField = {content : modifiedContentRef.current.value };
+      await updateDoc(modiDoc, newField);
+     
+      setModified(false);
+      setChanged(true);
+    }
+
+  }
+  function fn_delete(key){
+    console.log("삭제" + key);
   }
 
   const AB = useRef();
@@ -151,24 +174,39 @@ function ActiveExample() {
                 <Accordion.Body ref={AB}>
                   <Row key={uniqueId}>
                     <Col>
-                      <Form.Group className="mb-3-hidden">
-                        <Form.Control
-                          as="textarea"
-                          rows={5}
-                          defaultValue={value.content}
-                        />
-                      </Form.Group>
-                      <h1>{value.content}</h1>
+                      {/* 글 수정 버튼 누를시 생성 */}
+                      {modified ===value.comment  ?   
+                        <Form.Group >
+                          <Form.Control
+                            as="textarea"
+                            rows={5}
+                            defaultValue={value.content}
+                            ref={modifiedContentRef}
+                          />
+                        </Form.Group>
+                      :
+                        <h1>{value.content}</h1>
+                      }
+
                     </Col>
                     <Col xs="auto">
+                    {modified ===value.comment  ?   
                       <Button
-                        onClick={() => fn_comnet_save(value.comment)}
+                      onClick={() => fn_modified(value.comment)  }
+                      className="button is-info"
+                    >
+                      수정한거 저장!
+                    </Button>
+                    :
+                      <Button
+                        onClick={() => fn_modified(value.comment)}
                         className="button is-info"
                       >
                         수정
                       </Button>
+                    }
                       <Button
-                        onClick={() => fn_comnet_save(value.comment)}
+                        onClick={() => fn_delete(value.comment)}
                         className="button is-danger"
                       >
                         삭제
