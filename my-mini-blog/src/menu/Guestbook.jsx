@@ -1,16 +1,14 @@
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
+import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import "./GuestBook.css";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import { useState, useEffect, useId, useRef } from "react";
-import moment from 'moment';
-import 'moment/locale/ko';	//대한민국 
+import { useState, useEffect, useId, useRef } from "react"; 
+import "moment/locale/ko"; //대한민국
 // 파이어베이서 파일에서 import 해온 db
-import { db } from "../FireBase/DBconfig";
-import GuestBookDetail from "./GuestBookDetail";
+import { db } from "../FireBase/DBconfig"; 
+import Modalpop from './../component/ModalCRUD'
 // db에 접근해서 데이터를 꺼내게 도와줄 친구들
 import {
   collection,
@@ -22,7 +20,7 @@ import {
   orderBy,
   limit,
   query,
-  fromDate,
+  fromDate,where
 } from "firebase/firestore/lite";
 
 function ActiveExample() {
@@ -32,13 +30,7 @@ function ActiveExample() {
   const [created, setCreated] = useState(false);
   const [modified, setModified] = useState(false);
  
-
-  const createdTitleRef = useRef();
-  
-  const createdContentRef = useRef();
   const modifiedContentRef = useRef();
-  const createdNameRef = useRef();
-
   // db의 users 컬렉션을 가져옴
   const usersCollectionRef = collection(db, "guestbook");
   // 유니크 id를 만들기 위한 useId(); - react 18 기능으로, 이 훅을 이렇게 사용하는게 맞고 틀린지는 모른다.
@@ -50,11 +42,8 @@ function ActiveExample() {
     // 비동기로 데이터 받을준비
     const getUsers = async () => {
       // getDocs로 컬렉션안에 데이터 가져오기
-      const q = query(
-        collection(db, "guestbook"),
-        orderBy("comment", "desc"),
-      );
-      const data = await getDocs(q); 
+      const q = query(collection(db, "guestbook"), orderBy("comment", "desc"));
+      const data = await getDocs(q);
       // users에 data안의 자료 추가. 객체에 id 덮어씌우는거
       setUsers(
         data.docs.map((findDoc) => ({ ...findDoc.data(), id: findDoc.id }))
@@ -81,83 +70,42 @@ function ActiveExample() {
 
   async function fn_modified(key) {
     
-    console.log("수정" + key);
-    //key.target.style.display = "none";
-    if(!modified ) {
+    
+    if (!modified) {
+
       setModified(key);
-    }else if(modified > 0){
- 
-      console.log("tnwjdtnwjd"+modified+"/" +modifiedContentRef.current.value +Number(key))
-      //id 로 해당 디비중에 값을 찾음.
- 
-      const modiDoc = doc(db, "comment", String(modified))
-      console.log("modiDoc"+JSON.stringify(modiDoc))
-      const newField = {content : modifiedContentRef.current.value };
-      await updateDoc(modiDoc, newField);
-     
+
+
+    } else if (modified > 0) {
+
+      const q = query(collection(db, "guestbook"), where("comment", "==", key));
+      const querySnapshot = await getDocs(q);
+      let docID = '';
+      querySnapshot.forEach((doc) => {
+        docID = doc.id;
+      });
+      const guestmodified = doc(db, "guestbook", docID);
+      await updateDoc(guestmodified,  { content: modifiedContentRef.current.value });
       setModified(false);
       setChanged(true);
+ 
     }
-
   }
-  function fn_delete(key){
+  function fn_delete(key) {
     console.log("삭제" + key);
   }
-
-  const AB = useRef();
-  function fn_created_setting() {
  
-    fn_created();
-  }
-
-  // 비동기로 데이터 받을준비
-  async function fn_created() {
-    // getDocs로 컬렉션안에 데이터 가져오기
-
-    //console.log("data:::"+JSON.stringify(data))
-    // users에 data안의 자료 추가. 객체에 id 덮어씌우는거
-
-    const usersCollectionRef = collection(db, "guestbook");
-    const q = query(
-      collection(db, "guestbook"),
-      orderBy("comment", "desc"),
-      limit(1)
-    );
-    const data2 = await getDocs(q);
-
-    const maxnum = data2.docs.map((findDoc) => ({
-      ...findDoc.data(),
-      id: findDoc.id,
-    }));
-
-    console.log("save시도");
  
-    await addDoc(usersCollectionRef, { title: createdTitleRef.current.value
-      , content  : createdContentRef.current.value
-      , name     : createdNameRef.current.value
-      , created  : new Date()
-      , comment  : maxnum[0].comment+1
-    });
-    setCreated(false)
-    setChanged(true);
-
-  }
-
 
   function fn_created_coment(key) {
     console.log("Dcreatedcoment" + key);
-
-
-
-
-
-
   }
-  function fn_date(inputDate){
-  
-    const date = new Date(+inputDate + 3240 * 10000).toISOString().split("T")[0]
-    
-    return date
+  function fn_date(inputDate) {
+    const date = new Date(+inputDate + 3240 * 10000)
+      .toISOString()
+      .split("T")[0];
+
+    return date;
   }
 
   const contentList = (
@@ -171,12 +119,12 @@ function ActiveExample() {
                 <Accordion.Header key={uniqueId}>
                   {value.title}
                 </Accordion.Header>
-                <Accordion.Body ref={AB}>
+                <Accordion.Body  >
                   <Row key={uniqueId}>
                     <Col>
                       {/* 글 수정 버튼 누를시 생성 */}
-                      {modified ===value.comment  ?   
-                        <Form.Group >
+                      {modified === value.comment ? (
+                        <Form.Group>
                           <Form.Control
                             as="textarea"
                             rows={5}
@@ -184,27 +132,26 @@ function ActiveExample() {
                             ref={modifiedContentRef}
                           />
                         </Form.Group>
-                      :
+                      ) : (
                         <h1>{value.content}</h1>
-                      }
-
+                      )}
                     </Col>
                     <Col xs="auto">
-                    {modified ===value.comment  ?   
-                      <Button
-                      onClick={() => fn_modified(value.comment)  }
-                      className="button is-info"
-                    >
-                      수정한거 저장!
-                    </Button>
-                    :
-                      <Button
-                        onClick={() => fn_modified(value.comment)}
-                        className="button is-info"
-                      >
-                        수정
-                      </Button>
-                    }
+                      {modified === value.comment ? (
+                        <Button
+                          onClick={() => fn_modified(value.comment)}
+                          className="button is-info"
+                        >
+                          수정한거 저장!
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => fn_modified(value.comment)}
+                          className="button is-info"
+                        >
+                          수정
+                        </Button>
+                      )}
                       <Button
                         onClick={() => fn_delete(value.comment)}
                         className="button is-danger"
@@ -213,14 +160,19 @@ function ActiveExample() {
                       </Button>
                     </Col>
                   </Row>
-                  <Row><Col>작성자 : {value.name}  |  작성일 :{fn_date(value.created.seconds*1000)}</Col></Row>
+                  <Row>
+                    <Col>
+                      작성자 : {value.name} | 작성일 :
+                      {fn_date(value.created.seconds * 1000)}
+                    </Col>
+                  </Row>
                   <Row>
                     <Col>
                       <Form.Control
                         className="mb-2"
                         id="inlineFormInput"
                         placeholder="댓글"
-                        ref={AB}
+                         
                       />
                     </Col>
                     <Col xs="auto">
@@ -255,44 +207,12 @@ function ActiveExample() {
         </Col>
       </Row>
       <>
+      {/* 방명록 등록 팝업  */}
         {created && (
-          <Modal.Dialog>
-            <Modal.Header>
-              <Form.Control
-                id="inlineFormInput"
-                ref={createdTitleRef}
-                placeholder="제목"
-                maxLength="40"
-              />
-            </Modal.Header>
-
-            <Modal.Body>
-              <Form.Control
-                as="textarea"
-                ref={createdContentRef}
-                rows={5}
-                maxLength="200"
-                placeholder="내용"
-              />
-            </Modal.Body>
-
-            <Modal.Footer>
-              <Col>
-                <Form.Control
-                  id="inlineFormInput"
-                  ref={createdNameRef}
-                  maxLength="20"
-                  placeholder="작성자"
-                />
-              </Col>
-              <Button variant="primary" onClick={() => fn_created_setting()}>
-                등록 >___@{" "}
-              </Button>
-              <Button variant="secondary" onClick={() => setCreated(false)}>
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal.Dialog>
+          <Modalpop 
+          setCreated={setCreated} 
+          setChanged={setChanged}
+          ></Modalpop>
         )}
       </>
 
