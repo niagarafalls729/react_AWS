@@ -30,6 +30,7 @@ export default function ModalCRUD({setCreated,setChanged}) {
   const createdContentRef = useRef();
 
   const createdNameRef = useRef();
+  const createdPassRef = useRef();
   async function fn_created() {
     // getDocs로 컬렉션안에 데이터 가져오기
 
@@ -57,6 +58,7 @@ export default function ModalCRUD({setCreated,setChanged}) {
       name: createdNameRef.current.value,
       created: new Date(),
       comment: maxnum[0].comment + 1,
+      password : createdPassRef.current.value,
     }); 
     setCreated(false)
     setChanged(true)
@@ -92,6 +94,14 @@ export default function ModalCRUD({setCreated,setChanged}) {
             placeholder="작성자"
           />
         </Col>
+        <Col>
+          <Form.Control
+            id="inlineFormInput"
+            ref={createdPassRef}
+            maxLength="20"
+            placeholder="비밀번호"
+          />
+        </Col>        
         <Button variant="primary" onClick={() => fn_created()}>
           등록 >___@{" "}
         </Button>

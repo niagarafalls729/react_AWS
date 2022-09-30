@@ -3,12 +3,13 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
+import InputGroup from "react-bootstrap/InputGroup";
 import "./GuestBook.css";
-import { useState, useEffect, useId, useRef } from "react"; 
+import { useState, useEffect, useId, useRef } from "react";
 import "moment/locale/ko"; //대한민국
 // 파이어베이서 파일에서 import 해온 db
-import { db } from "../FireBase/DBconfig"; 
-import Modalpop from './../component/ModalCRUD'
+import { db } from "../FireBase/DBconfig";
+import Modalpop from "../component/ModalCRUD";
 // db에 접근해서 데이터를 꺼내게 도와줄 친구들
 import {
   collection,
@@ -20,7 +21,8 @@ import {
   orderBy,
   limit,
   query,
-  fromDate,where
+  fromDate,
+  where,
 } from "firebase/firestore/lite";
 
 function ActiveExample() {
@@ -29,8 +31,10 @@ function ActiveExample() {
   //C 로 쓰는 값
   const [created, setCreated] = useState(false);
   const [modified, setModified] = useState(false);
- 
+
   const modifiedContentRef = useRef();
+
+  const [ modifiedPassWord , setModifiedPassWord ]= useState(false); 
   // db의 users 컬렉션을 가져옴
   const usersCollectionRef = collection(db, "guestbook");
   // 유니크 id를 만들기 위한 useId(); - react 18 기능으로, 이 훅을 이렇게 사용하는게 맞고 틀린지는 모른다.
@@ -67,35 +71,51 @@ function ActiveExample() {
   function fn_comnet_save(key) {
     console.log("댓글" + key);
   }
+  function fn_password(password ,comment){
+    console.log("modifiedPassWord"+modifiedPassWord+"///"+password)
+    setModified(comment)
+    if( modifiedPassWord == password){
+      console.log("비밀번호 확인 성공")
+      setModifiedPassWord("pass")
+    }else{
+      setModifiedPassWord("no")
+    }
 
+  }
   async function fn_modified(key) {
-    
-    
     if (!modified) {
-
       setModified(key);
-
-
     } else if (modified > 0) {
-
       const q = query(collection(db, "guestbook"), where("comment", "==", key));
       const querySnapshot = await getDocs(q);
-      let docID = '';
+      let docID = "";
       querySnapshot.forEach((doc) => {
         docID = doc.id;
       });
       const guestmodified = doc(db, "guestbook", docID);
-      await updateDoc(guestmodified,  { content: modifiedContentRef.current.value });
+      await updateDoc(guestmodified, {
+        content: modifiedContentRef.current.value,
+      });
       setModified(false);
       setChanged(true);
- 
     }
   }
-  function fn_delete(key) {
-    console.log("삭제" + key);
+  async function fn_delete(key) {
+
+    const q = query(collection(db, "guestbook"), where("comment", "==", key));
+    const querySnapshot = await getDocs(q);
+    let docID = "";
+    querySnapshot.forEach((doc) => {
+      docID = doc.id;
+    });
+    const guestmodified = doc(db, "guestbook", docID);
+    await deleteDoc(guestmodified, {
+      content: modifiedContentRef.current.value,
+    });
+    setModified(false);
+    setChanged(true);
+
   }
- 
- 
 
   function fn_created_coment(key) {
     console.log("Dcreatedcoment" + key);
@@ -119,11 +139,11 @@ function ActiveExample() {
                 <Accordion.Header key={uniqueId}>
                   {value.title}
                 </Accordion.Header>
-                <Accordion.Body  >
+                <Accordion.Body>
                   <Row key={uniqueId}>
                     <Col>
                       {/* 글 수정 버튼 누를시 생성 */}
-                      {modified === value.comment ? (
+                      {modified === value.comment &&  modifiedPassWord == "pass" ? (
                         <Form.Group>
                           <Form.Control
                             as="textarea"
@@ -137,27 +157,48 @@ function ActiveExample() {
                       )}
                     </Col>
                     <Col xs="auto">
-                      {modified === value.comment ? (
-                        <Button
-                          onClick={() => fn_modified(value.comment)}
-                          className="button is-info"
-                        >
-                          수정한거 저장!
-                        </Button>
+                      {modified === value.comment &&  modifiedPassWord == "pass" ? (
+                        <>
+                          <InputGroup size="sm"> 
+                          <Button
+                            onClick={() => fn_modified(value.comment)}
+                            variant="outline-secondary"
+                          >
+                            저장!
+                          </Button>
+                          <Button
+                            onClick={() => fn_delete(value.comment)}
+                            variant="outline-secondary"
+                          >
+                            삭제
+                          </Button>
+                          </InputGroup>
+                        </>
                       ) : (
+                        <>
+                          <InputGroup size="sm">
+                            <Form.Control maxLength="10" placeholder="비밀번호" className="inputSize" onChange={(e)=>setModifiedPassWord(e.target.value) }/>
+                            <Button
+                              variant="outline-secondary"
+                              onClick={() => 
+                                fn_password(value.password , value.comment)
+                              }
+                            >
+                              수정 or 삭제
+                            </Button>
+                           
+                          </InputGroup>
+
+                          {/*                         
+
                         <Button
                           onClick={() => fn_modified(value.comment)}
                           className="button is-info"
                         >
                           수정
-                        </Button>
+                        </Button> */}
+                        </>
                       )}
-                      <Button
-                        onClick={() => fn_delete(value.comment)}
-                        className="button is-danger"
-                      >
-                        삭제
-                      </Button>
                     </Col>
                   </Row>
                   <Row>
@@ -172,7 +213,6 @@ function ActiveExample() {
                         className="mb-2"
                         id="inlineFormInput"
                         placeholder="댓글"
-                         
                       />
                     </Col>
                     <Col xs="auto">
@@ -207,12 +247,9 @@ function ActiveExample() {
         </Col>
       </Row>
       <>
-      {/* 방명록 등록 팝업  */}
+        {/* 방명록 등록 팝업  */}
         {created && (
-          <Modalpop 
-          setCreated={setCreated} 
-          setChanged={setChanged}
-          ></Modalpop>
+          <Modalpop setCreated={setCreated} setChanged={setChanged}></Modalpop>
         )}
       </>
 
