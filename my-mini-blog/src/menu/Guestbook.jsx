@@ -7,6 +7,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import "./GuestBook.css";
 import { useState, useEffect, useId, useRef } from "react";
 import "moment/locale/ko"; //대한민국
+import Comment from '../component/CommentCRUD'
 // 파이어베이서 파일에서 import 해온 db
 import { db } from "../FireBase/DBconfig";
 import Modalpop from "../component/ModalCRUD";
@@ -56,17 +57,7 @@ function ActiveExample() {
     setChanged(false);
     getUsers();
   }, [changed]);
-
-  // function fn_mouseOver(key) {
-  //   //이건 마우스 위로 올렸을때 효과주기 연습.
-  //   key.target.style.background = "blue";
-  //   key.target.style.color = "white";
-  // }
-
-  // function fn_mouseLeave(key) {
-  //   key.target.style.background = "white";
-  //   key.target.style.color = "black";
-  // }
+ 
 
   function fn_comnet_save(key) {
     console.log("댓글" + key);
@@ -117,9 +108,6 @@ function ActiveExample() {
 
   }
 
-  function fn_created_coment(key) {
-    console.log("Dcreatedcoment" + key);
-  }
   function fn_date(inputDate) {
     const date = new Date(+inputDate + 3240 * 10000)
       .toISOString()
@@ -207,23 +195,10 @@ function ActiveExample() {
                       {fn_date(value.created.seconds * 1000)}
                     </Col>
                   </Row>
-                  <Row>
-                    <Col>
-                      <Form.Control
-                        className="mb-2"
-                        id="inlineFormInput"
-                        placeholder="댓글"
-                      />
-                    </Col>
-                    <Col xs="auto">
-                      <Button
-                        onClick={() => fn_created_coment(value.comment)}
-                        className="mb-2"
-                      >
-                        등록
-                      </Button>
-                    </Col>
-                  </Row>
+ 
+                    
+                    <Comment value = {value.comment}></Comment>
+ 
                 </Accordion.Body>
               </Accordion.Item>
             </>
