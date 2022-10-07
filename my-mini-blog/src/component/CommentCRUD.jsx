@@ -1,5 +1,7 @@
 import React from "react";
 import Col from "react-bootstrap/Col";
+import InputGroup from "react-bootstrap/InputGroup";
+import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useRef, useState, useId, useEffect } from "react";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
@@ -34,10 +36,9 @@ function Comment(props) {
       {random}
     </Form.Label>
   );
-  
+
   const [users, setUsers] = useState([]);
   const [change, setChange] = useState(false);
-
 
   useEffect(() => {
     // 비동기로 데이터 받을준비
@@ -45,8 +46,7 @@ function Comment(props) {
       const q = query(
         collection(db, "comment"),
         //where("guestbook_key", "==", props.value),
-        orderBy("comment_key","asc") ,
-        
+        orderBy("comment_key", "asc")
       );
       // getDocs로 컬렉션안에 데이터 가져오기
       const data = await getDocs(q);
@@ -59,7 +59,7 @@ function Comment(props) {
       // users.map((value) => console.log(value.content));
     };
     getUsers();
-  //}, [change]);
+    //}, [change]);
   }, [change]);
 
   const [user, setUser] = useState();
@@ -69,16 +69,13 @@ function Comment(props) {
     if (random != capcha.current.value) {
       return alert("자동입력방지 번호가 틀렸습니다.!");
     }
-    if ( content.current.value == ""
-      || name.current.value == ""
-      || pw.current.value == "" ){
-
-        return alert("내용, 작성자 ,비밀번호 모두 필수값임! ");
+    if (
+      content.current.value == "" ||
+      name.current.value == "" ||
+      pw.current.value == ""
+    ) {
+      return alert("내용, 작성자 ,비밀번호 모두 필수값임! ");
     }
-    
-    
-    
-
 
     const usersCollectionRef = collection(db, "comment");
     const q = query(
@@ -93,11 +90,6 @@ function Comment(props) {
       id: findDoc.id,
     }));
 
-    // console.log("save시도"+maxnum[0].comment_key);
-    console.log(content.current.value)
-    console.log(name.current.value)
-    console.log(pw.current.value)
-
     await addDoc(usersCollectionRef, {
       comment_key: maxnum[0].comment_key + 1,
       content: content.current.value,
@@ -106,13 +98,36 @@ function Comment(props) {
       guestbook_key: props.value,
       password: pw.current.value,
     });
-    change ? setChange(false) : setChange(true)
-     
+    change ? setChange(false) : setChange(true);
   }
 
+  function fn_date(inputDate) {
+    const date = new Date(+inputDate + 3240 * 10000)
+      .toISOString()
+      .split("T")[0];
+
+    return date;
+  }
   return (
     <>
-      {users.map((value) => ( value.guestbook_key == props.value) && <h5>댓글 : {value.content}</h5>)}
+      {users.map(
+        (value) =>
+          value.guestbook_key == props.value && (
+            <div className="input-group input-group-sm"  style={{  borderTop: "1px solid"}}>
+              <Col>
+                <h5>
+                  {value.name} : {value.content}
+                </h5>
+              </Col>
+              <Col xs="2">
+                <h5>
+                  {fn_date(value.created.seconds * 1000)}{" "}
+                  <Button variant="outline-secondary">삭제</Button>
+                </h5>
+              </Col>
+            </div>
+          )
+      )}
 
       <FloatingLabel controlId="floatingTextarea2" label="Comments">
         <Form.Control
@@ -130,14 +145,23 @@ function Comment(props) {
               placeholder="왼쪽번호입력!"
               class="form-control"
               ref={capcha}
-               
             />
           </Col>
           <Col xs="4">
-            <input ref={name} maxLength="10" placeholder="작성자" class="form-control" />
+            <input
+              ref={name}
+              maxLength="10"
+              placeholder="작성자"
+              class="form-control"
+            />
           </Col>
           <Col xs="2">
-            <input ref={pw} maxLength="10" placeholder="비밀번호" class="form-control" />
+            <input
+              ref={pw}
+              maxLength="10"
+              placeholder="비밀번호"
+              class="form-control"
+            />
           </Col>
           <Col>
             <button
