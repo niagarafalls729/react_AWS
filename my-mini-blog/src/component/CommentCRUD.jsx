@@ -3,9 +3,11 @@ import Col from "react-bootstrap/Col";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+
 import { useRef, useState, useId, useEffect } from "react";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 
+import "./CommentCRUD.css";
 import {
   collection,
   getDocs,
@@ -25,9 +27,8 @@ function Comment(props) {
 
   const content = useRef();
   const name = useRef();
-  const pw = useRef();
+  const pw = useRef(); 
   const capcha = useRef();
-
   const uniqueId = useId();
 
   const random = Math.floor(Math.random() * 3 * 1000);
@@ -39,7 +40,7 @@ function Comment(props) {
 
   const [users, setUsers] = useState([]);
   const [change, setChange] = useState(false);
-
+  const [checkPW, setCheckPW] = useState();
   useEffect(() => {
     // 비동기로 데이터 받을준비
     const getUsers = async () => {
@@ -103,7 +104,6 @@ function Comment(props) {
     capcha.current.value = "";
     pw.current.value = "";
 
-
     change ? setChange(false) : setChange(true);
   }
 
@@ -115,7 +115,18 @@ function Comment(props) {
     return date;
   }
 
-  async function fn_delete(key) {
+ 
+
+  async function fn_delete(key,password) {
+    
+    console.log("password"+password) 
+
+    if(checkPW != password){
+      
+      return alert("댓글 비밀번호가 다름!")
+    }
+    setCheckPW("");
+
     const q = query(collection(db, "comment"), where("comment_key", "==", key));
     const querySnapshot = await getDocs(q);
     let docID = "";
@@ -141,16 +152,23 @@ function Comment(props) {
                   {value.name} : {value.content}
                 </h5>
               </Col>
-              <Col xs="2">
-                <h5>
-                  {fn_date(value.created.seconds * 1000)}{" "}
-                  <Button
-                    variant="outline-secondary"
-                    onClick={() => fn_delete(value.comment_key)}
-                  >
-                    삭제
-                  </Button>
-                </h5>
+              <Col xs="3">
+                <InputGroup size="sm">
+                <h5 style={{marginRight:"10px"}}>작성일 : {fn_date(value.created.seconds * 1000)} </h5>
+                
+                <Form.Control
+                  maxLength="10"
+                  placeholder="댓글 비밀번호"
+                  className="inputSize" 
+                  onChange={(e)=>setCheckPW(e.target.value)}
+                />
+                <Button
+                  variant="outline-secondary"
+                  onClick={(e) => fn_delete(value.comment_key,value.password)}
+                >
+                  삭제
+                </Button>
+                </InputGroup>
               </Col>
             </div>
           )
