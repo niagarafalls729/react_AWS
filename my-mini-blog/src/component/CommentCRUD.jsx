@@ -98,6 +98,12 @@ function Comment(props) {
       guestbook_key: props.value,
       password: pw.current.value,
     });
+    content.current.value = "";
+    name.current.value = "";
+    capcha.current.value = "";
+    pw.current.value = "";
+
+
     change ? setChange(false) : setChange(true);
   }
 
@@ -108,12 +114,28 @@ function Comment(props) {
 
     return date;
   }
+
+  async function fn_delete(key) {
+    const q = query(collection(db, "comment"), where("comment_key", "==", key));
+    const querySnapshot = await getDocs(q);
+    let docID = "";
+    querySnapshot.forEach((doc) => {
+      docID = doc.id;
+    });
+    const guestmodified = doc(db, "comment", docID);
+    await deleteDoc(guestmodified);
+    change ? setChange(false) : setChange(true);
+  }
+
   return (
     <>
       {users.map(
         (value) =>
           value.guestbook_key == props.value && (
-            <div className="input-group input-group-sm"  style={{  borderTop: "1px solid"}}>
+            <div
+              className="input-group input-group-sm"
+              style={{ borderTop: "1px solid" }}
+            >
               <Col>
                 <h5>
                   {value.name} : {value.content}
@@ -122,7 +144,12 @@ function Comment(props) {
               <Col xs="2">
                 <h5>
                   {fn_date(value.created.seconds * 1000)}{" "}
-                  <Button variant="outline-secondary">삭제</Button>
+                  <Button
+                    variant="outline-secondary"
+                    onClick={() => fn_delete(value.comment_key)}
+                  >
+                    삭제
+                  </Button>
                 </h5>
               </Col>
             </div>
