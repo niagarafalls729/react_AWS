@@ -56,7 +56,7 @@ const GeoLocation = () => {
         </li>
 
         {display && (
-          <li className={display ? "MapClose-X" : "hide"}>
+          <li className={display ? "mainClose-X-map" : "hide"}>
             <button className="w3-bar-item w3-button" onClick={MapClose}>
               &times;
             </button>

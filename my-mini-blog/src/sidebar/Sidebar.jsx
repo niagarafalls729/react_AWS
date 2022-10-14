@@ -8,7 +8,7 @@ import { SidebarClose } from "../context/SidebarClose";
 import ClientIp from "../weget/ClientIp";
 import Weather from "../weget/Weather";
 // import IndexNavbar from "./IndexNavbar";
-function Sidebar() {
+function Sidebar(props) {
   const [menuList, setMenuList] = useState([
     {
       title: "블로그 주인",
@@ -67,8 +67,11 @@ function Sidebar() {
   function open() {
     setSideBarBool(true);
     setConSidebarBool(true);
-  }
-
+  } 
+  console.log("디슾플레이 사이즈"+props.size)
+  const displaySize = props.size  >  5 ? "w3-sidebar w3-bar-block w3-animate-left" : "w3-sidebar w3-bar-block w3-animate-left mobile";
+  console.log("디슾플레이 사이즈"+displaySize)
+  
   return (
     <>
       <div className={sideBarBool ? "SidebarThema" : "NoneSideberThema"}>
@@ -78,7 +81,8 @@ function Sidebar() {
         ></link>
 
         <div
-          className="w3-sidebar w3-bar-block w3-animate-left"
+          
+          className={displaySize}
           id="mySidebar"
           ref={mySider}
         >
