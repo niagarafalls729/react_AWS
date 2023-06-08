@@ -8,6 +8,7 @@ import { SidebarClose } from "../context/SidebarClose";
 import ClientIp from "../weget/ClientIp";
 import Weather from "../weget/Weather";
 // import IndexNavbar from "./IndexNavbar";
+
 function Sidebar() {
   const [menuList, setMenuList] = useState([
     {
@@ -19,27 +20,27 @@ function Sidebar() {
       title: "공부 일지",
       itemId: "2",
       pageName: "StudyHistory",
-      subNav: [
-        {
-          subTitle: "2-2",
-          itemId: "/2/2-1",
-        },
-        {
-          subTitle: "2-2",
-          itemId: "/2/2-2",
-        },
-      ],
+      // subNav: [
+      //   {
+      //     subTitle: "2-2",
+      //     itemId: "/2/2-1",
+      //   },
+      //   {
+      //     subTitle: "2-2",
+      //     itemId: "/2/2-2",
+      //   },
+      // ],
     },
     {
       title: "방명록",
       itemId: "3",
       pageName: "Guestbook",
-      subNav: [
-        {
-          subTitle: "3-1",
-          itemId: "/3/3-1",
-        },
-      ],
+      // subNav: [
+      //   {
+      //     subTitle: "3-1",
+      //     itemId: "/3/3-1",
+      //   },
+      // ],
     },
   ]);
   //map 함수, 람다
@@ -54,6 +55,7 @@ function Sidebar() {
   const { conSidebarBool, setConSidebarBool } = useContext(SidebarClose);
 
   function ChoiceMenu(name) {
+    console.log(name)
     setMenuIndex(name);
   }
 
